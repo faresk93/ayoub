@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ayoub's World · Level 11</title>
+  <meta name="description" content="A 3D blocky birthday world for Ayoub's 11th birthday — from Uncle Fares." />
+  <meta name="theme-color" content="#3d7fe6" />
+  <meta property="og:title" content="Happy 11th Birthday, Ayoub!" />
+  <meta property="og:description" content="Enter Ayoub's 3D block world — a birthday gift from Uncle Fares." />
+  <meta property="og:image" content="https://faresk93.github.io/ayoub/assets/ayoub-mc.webp" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%235d9e33' d='M0 0h8v3H0z'/%3E%3Cpath fill='%23866043' d='M0 3h8v5H0z'/%3E%3Cpath fill='%234f8a2a' d='M1 3h1v1H1zM4 3h1v2H4zM6 3h1v1H6z'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "motion": "https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm"
+      }
+    }
+  </script>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" crossorigin />
+</head>
+<body>
+  <!-- Loader -->
+  <div class="loader" id="loader" role="status" aria-live="polite">
+    <div class="loader__cube" aria-hidden="true"><i></i><i></i><i></i></div>
+    <p class="loader__title">Generating Ayoub's World…</p>
+    <div class="loader__bar"><span id="loaderFill"></span></div>
+    <p class="loader__hint" id="loaderHint">Placing blocks…</p>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud" aria-label="Game status">
+    <div class="hud__ach" title="Achievements">
+      <img class="px" id="hudTrophy" alt="" width="24" height="24" />
+      <span><b id="achCount">0</b>/<span id="achTotal">9</span></span>
+    </div>
+    <button class="hud__btn" id="muteBtn" aria-label="Mute sound" aria-pressed="false">
+      <svg viewBox="0 0 8 8" width="22" height="22" shape-rendering="crispEdges" aria-hidden="true">
+        <path class="snd-on" fill="currentColor" d="M0 3h2v2H0zM2 2h1v4H2zM3 1h1v6H3zM5 2h1v1H5zM5 5h1v1H5zM6 3h1v2H6z"/>
+        <path class="snd-off" fill="currentColor" d="M0 3h2v2H0zM2 2h1v4H2zM3 1h1v6H3zM5 2h1v1H5zM7 2h1v1H7zM6 3h1v2H6zM5 5h1v1H5zM7 5h1v1H7z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+
+  <main>
+    <!-- 3D hero world -->
+    <section class="hero" id="top" aria-label="Ayoub's 3D birthday world">
+      <canvas id="world" class="world" tabindex="-1" aria-label="3D voxel island with Ayoub and his family. Tap characters to talk."></canvas>
+      <img class="hero__fallback" src="assets/ayoub-avatar.webp" alt="Ayoub as a blocky character" width="640" height="684" />
+      <div class="bubble3d" id="bubble3d" hidden></div>
+
+      <div class="hero__ui" id="heroUI">
+        <div class="hero__brand">
+          <h1 class="logo" aria-label="Ayoub">
+            <span class="logo__l">A</span><span class="logo__l">Y</span><span class="logo__l">O</span><span class="logo__l">U</span><span class="logo__l">B</span>
+          </h1>
+          <p class="logo__sub">Birthday Edition · Level 11</p>
+          <p class="splash" id="splash" aria-hidden="true">Happy 11th Birthday!</p>
+        </div>
+        <div class="hero__menu">
+          <button class="mc-btn mc-btn--go" id="playBtn">▶ Play as Ayoub</button>
+          <button class="mc-btn" id="scrollBtn">Explore the World ↓</button>
+          <a class="mc-btn" href="#gift">Open Uncle's Gift</a>
+          <p class="hero__foot">Tap Ayoub &amp; the family · a gift from Uncle Fares</p>
+        </div>
+      </div>
+
+      <div class="game-ui" id="gameUI" hidden>
+        <div class="game-ui__top">
+          <div class="gstat gstat--gem"><img class="px" id="gemIcon" alt="" width="22" height="22" /><span>Treasures <b id="gemCount">0/11</b></span></div>
+          <div class="gstat gstat--fam"><img class="px" id="famIcon" alt="" width="22" height="22" /><span>Family <b id="famCount">0/5</b></span></div>
+        </div>
+        <button class="mc-btn game-ui__exit" id="exitBtn" aria-label="Exit game">✕ Exit</button>
+        <button class="jump-btn" id="jumpBtn" aria-label="Jump">JUMP</button>
+        <p class="game-hint" id="gameHint" hidden>Tap the ground to walk · drag to look around · WASD / arrows + Space on keyboard. Find 11 treasures and say hi to the family!</p>
+        <div class="win" id="gameWin" hidden>
+          <p class="win__kicker">All 11 treasures found!</p>
+          <h2 class="win__title" aria-label="Happy Birthday Ayoub!"><span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span> <span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span><br /><span>A</span><span>Y</span><span>O</span><span>U</span><span>B</span><span>!</span></h2>
+          <div class="win__btns">
+            <button class="mc-btn mc-btn--go" id="winContinue">Keep exploring</button>
+            <button class="mc-btn" id="winScroll">See more gifts ↓</button>
+          </div>
+        </div>
+      </div>
+      <div class="ground ground--grass" aria-hidden="true"></div>
+    </section>
+
+    <!-- Player profile -->
+    <section class="player tex-sky" id="player">
+      <div class="player__wrap">
+        <div class="avatar-card reveal" id="avatarCard" role="button" tabindex="0" aria-label="Tap Ayoub's portrait">
+          <div class="nametag">Ayoub</div>
+          <img src="assets/ayoub-avatar.webp" alt="Ayoub as a blocky Minecraft-style character with curly hair, glasses and a white, green and black hoodie" width="640" height="684" loading="lazy" />
+          <div class="pedestal" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+        <div class="panel stats reveal">
+          <h2 class="panel__title">Player Profile</h2>
+          <dl class="stats__list">
+            <div><dt>Name</dt><dd>AYOUB</dd></div>
+            <div><dt>Class</dt><dd>5th Grade Hero</dd></div>
+            <div><dt>Spawned</dt><dd>17 Nov 2015</dd></div>
+            <div><dt>Days played</dt><dd><b id="days">0</b></dd></div>
+            <div><dt>Loves</dt><dd>Minecraft · Mario · Nintendo</dd></div>
+            <div><dt>Squad</dt><dd>Ilyes · Maha · Baba Deen · Mama Omi</dd></div>
+          </dl>
+          <div class="hearts" id="hearts" aria-label="10 out of 10 hearts"></div>
+          <div class="xp">
+            <div class="xp__lvl" id="xpLvl">10</div>
+            <div class="xp__bar"><span id="xpFill"></span></div>
+            <p class="xp__label" id="xpLabel">XP loading…</p>
+          </div>
+        </div>
+      </div>
+      <div class="ground ground--grass" aria-hidden="true"></div>
+    </section>
+
+    <!-- Two worlds -->
+    <section class="worlds tex-planks" id="worlds">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Dimension Portal</p>
+        <h2>Two Worlds, One Ayoub</h2>
+        <p class="sec-lead">Drag the slider to travel between the real world and the block world.</p>
+      </header>
+      <div class="compare reveal" id="compare" style="--p:50%">
+        <img src="assets/ayoub-real.webp" alt="Photo of Ayoub smiling with round glasses" width="760" height="820" loading="lazy" />
+        <img class="compare__top" src="assets/ayoub-mc.webp" alt="Ayoub in Minecraft block style" width="760" height="820" loading="lazy" />
+        <div class="compare__handle" aria-hidden="true"><span></span></div>
+        <span class="compare__tag compare__tag--l" aria-hidden="true">Block World</span>
+        <span class="compare__tag compare__tag--r" aria-hidden="true">Real World</span>
+        <input type="range" min="0" max="100" value="50" id="compareRange" aria-label="Slide between block world and real world" />
+      </div>
+    </section>
+
+    <!-- Squad -->
+    <section class="family tex-meadow" id="family">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Your Party</p>
+        <h2>The Best Squad</h2>
+        <p class="sec-lead">Every hero needs a team. Tap each card to see their power.</p>
+      </header>
+      <div class="cards" id="cards"></div>
+      <p class="squad-status" id="squadStatus">0 / 5 squad cards collected</p>
+    </section>
+
+    <div class="strata" aria-hidden="true"></div>
+
+    <!-- Mining -->
+    <section class="mine tex-stone" id="mine">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Birthday Mine</p>
+        <h2>Mine for Treasures</h2>
+        <p class="sec-lead">Tap a block 3 times to break it. Each one hides a birthday wish.</p>
+      </header>
+      <div class="mine__grid" id="mineGrid"></div>
+      <div class="hotbar" id="hotbar" aria-label="Collected items"></div>
+      <div class="chat" id="chat" aria-live="polite">
+        <p><span class="chat__who">&lt;Uncle Fares&gt; </span>Grab a pickaxe, Ayoub. Let's go mining!</p>
+      </div>
+    </section>
+
+    <!-- Bonus level -->
+    <section class="bonus" id="bonus">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Bonus Level · World 11-1</p>
+        <h2>Hit the ? Blocks</h2>
+        <p class="sec-lead">Jump-hit the blocks and collect 11 coins — one for every year.</p>
+      </header>
+      <div class="coins-count" aria-live="polite">
+        <img class="px" id="coinIcon" alt="" width="32" height="32" />
+        <span>× <b id="coinNum">00</b> / 11</span>
+      </div>
+      <div class="qrow" id="qrow"></div>
+      <div class="bricks" aria-hidden="true"></div>
+    </section>
+
+    <!-- 3D cake -->
+    <section class="cake-sec tex-planks-dark" id="cake">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Crafting Table</p>
+        <h2>Make a Wish</h2>
+        <p class="sec-lead">11 candles for 11 amazing years. Tap each flame to blow it out — drag to spin the cake.</p>
+      </header>
+      <div class="cake-stage">
+        <canvas id="cakeCanvas" class="cake-canvas" aria-label="3D birthday cake with 11 candles. Tap a flame to blow it out."></canvas>
+      </div>
+      <p class="candle-count" id="candleCount" aria-live="polite">11 candles left</p>
+      <button class="mc-btn mc-btn--go" id="blowBtn">Blow all candles</button>
+      <h3 class="hb-big" id="hbBig" aria-live="polite"></h3>
+    </section>
+
+    <div class="strata strata--deep" aria-hidden="true"></div>
+
+    <!-- Gift chest -->
+    <section class="gift" id="gift">
+      <header class="sec-head reveal">
+        <p class="sec-kicker">Legendary Loot</p>
+        <h2>A Chest from Uncle Fares</h2>
+        <p class="sec-lead">Something special is locked inside. Tap the chest to open it.</p>
+      </header>
+      <div class="chest-zone">
+        <div class="rays" id="rays" aria-hidden="true"></div>
+        <button class="chest" id="chest" aria-label="Open the gift chest">
+          <span class="chest__box">
+            <span class="chest__face chest__face--front"></span>
+            <span class="chest__face chest__face--back"></span>
+            <span class="chest__face chest__face--left"></span>
+            <span class="chest__face chest__face--right"></span>
+            <span class="chest__face chest__face--bottom"></span>
+            <span class="chest__glow"></span>
+          </span>
+          <span class="chest__lid" id="chestLid">
+            <span class="chest__face chest__face--top"></span>
+            <span class="lid__face lid__face--front"><i class="chest__lock"></i></span>
+            <span class="lid__face lid__face--back"></span>
+            <span class="lid__face lid__face--left"></span>
+            <span class="lid__face lid__face--right"></span>
+          </span>
+        </button>
+      </div>
+      <article class="letter panel" id="letter" hidden>
+        <h3 class="panel__title">Dear Ayoub,</h3>
+        <div class="letter__body" id="letterBody"></div>
+        <p class="letter__sign">— Your Uncle Fares</p>
+        <button class="mc-btn mc-btn--go" id="replayBtn">Back to Ayoub's World ↑</button>
+      </article>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="foot__hb">Happy Birthday · Joyeux anniversaire · <span lang="ar" dir="rtl">عيد ميلاد سعيد</span></p>
+    <p>Crafted with <img class="px heart-inline" id="footHeart" alt="love" width="16" height="16" /> by Uncle Fares for Ayoub · 17 November 2026</p>
+    <p class="foot__small">Fan-made birthday page inspired by block-building games. Not affiliated with Mojang or Nintendo.</p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
