@@ -8,6 +8,25 @@ export const AYOUB = {
   scale: 1.32,
   tag: "#ffff55",
   custom: "hoodie",
+  // 16x16 hand-drawn face from his Minecraft portrait: brows, big brown eyes, square glasses, big grin
+  face16: [
+    "hhHhhhhHhhhhHhhh",
+    "hHhhhHhhhHhhhhHh",
+    "hhhhhhhhhhhhhhhh",
+    "hhsshhhsshhhsshh",
+    "hssssssssssssssh",
+    "hskkkksssskkkksh",
+    "ssssssssssssssss",
+    "skkkkkksskkkkkks",
+    "skwpewkkkkwepwks",
+    "skweewksskweewks",
+    "skkkkkksskkkkkks",
+    "SssssssnnssssssS",
+    "ssssssssssssssss",
+    "ssssmttttttmssss",
+    "sssssmmmmmmsssss",
+    "ssssssssssssssss",
+  ],
 };
 
 export const FAMILY = [

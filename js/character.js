@@ -92,7 +92,9 @@ export function buildCharacter(spec) {
 
   // Head textures
   const fp = facePal(skin, hair);
-  const front = rowsTex(face({ style, glasses: spec.glasses, mustache: spec.mustache }), fp);
+  const front = spec.face16
+    ? rowsTex(spec.face16, { h: hair, H: shade(hair, -22), s: skin, S: shade(skin, -14), k: "#121212", w: "#ffffff", e: "#7a4521", p: "#24130a", n: shade(skin, -30), m: "#6e2a2a", t: "#ffffff", r: shade(skin, -8) })
+    : rowsTex(face({ style, glasses: spec.glasses, mustache: spec.mustache }), fp);
   const sideRows = [], backRows = [];
   const hairDepth = style === "long" ? 8 : style === "curly" ? 4 : style === "receding" ? 2 : 3;
   for (let y = 0; y < 8; y++) {
@@ -125,7 +127,7 @@ export function buildCharacter(spec) {
       tuft(1.6, 2, 2, sideX, 5.5 + Math.random() * 2.5, -4 + Math.random() * 7, i + 1);
     }
     for (let i = 0; i < 10; i++) tuft(2, 2, 1.6, -4 + Math.random() * 8, 4 + Math.random() * 4, -4.3, i + 2);
-    for (let i = 0; i < 5; i++) tuft(2, 1.6, 1.4, -3 + i * 1.6, 7.6, 4.2, i); // fringe
+    for (let i = 0; i < 5; i++) tuft(2, 1.4, 1.4, -3 + i * 1.6, 8.1, 4.2, i); // fringe
   } else if (style === "long") {
     tuft(8.6, 12, 1.2, 0, 1.5, -4.4, 0);
     tuft(1.2, 9, 3, -4.4, 2.5, -2, 1); tuft(1.2, 9, 3, 4.4, 2.5, -2, 1);
@@ -143,9 +145,8 @@ export function buildCharacter(spec) {
   if (spec.glasses) {
     const k = solid("#111");
     const fr = (w, h, x, y) => { const b = box(w, h, 0.6, k); b.position.set(x * PX, y * PX, 4.3 * PX); head.add(b); };
-    fr(3.2, 0.5, -2, 5.6); fr(3.2, 0.5, 2, 5.6); fr(3.2, 0.5, -2, 3.4); fr(3.2, 0.5, 2, 3.4);
-    fr(0.5, 2.6, -3.5, 4.5); fr(0.5, 2.6, -0.5, 4.5); fr(0.5, 2.6, 0.5, 4.5); fr(0.5, 2.6, 3.5, 4.5);
-    const arm = (x) => { const b = box(0.5, 0.5, 6, k); b.position.set(x * PX, 5.4 * PX, 1.2 * PX); head.add(b); };
+    if (!spec.face16) { fr(3.2, 0.5, -2, 5.6); fr(3.2, 0.5, 2, 5.6); fr(3.2, 0.5, -2, 3.4); fr(3.2, 0.5, 2, 3.4); fr(0.5, 2.6, -3.5, 4.5); fr(0.5, 2.6, -0.5, 4.5); fr(0.5, 2.6, 0.5, 4.5); fr(0.5, 2.6, 3.5, 4.5); }
+    const arm = (x) => { const b = box(0.5, 0.5, 6, k); b.position.set(x * PX, (spec.face16 ? 4.3 : 5.4) * PX, 1.2 * PX); head.add(b); };
     arm(-4.25); arm(4.25);
   }
 

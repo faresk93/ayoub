@@ -38,7 +38,7 @@ section { position: relative; padding: 88px var(--gutter) 96px; overflow: hidden
 @keyframes spin { from { transform: rotateX(-25deg) rotateY(0); } to { transform: rotateX(-25deg) rotateY(360deg); } }
 .loader__title { font-family: var(--font-px); font-size: clamp(12px, 3.4vw, 18px); text-shadow: var(--shadow-txt); margin: 0; }
 .loader__bar { width: min(80vw, 360px); height: 14px; background: #3f3f3f; border: 3px solid #000; }
-.loader__bar span { display: block; height: 100%; width: 0; background: var(--accent); box-shadow: inset 0 -4px 0 #2fbf2f; }
+.loader__bar span { display: block; height: 100%; width: 0; transition: width .22s ease-out; background: var(--accent); box-shadow: inset 0 -4px 0 #2fbf2f; }
 .loader__hint { margin: 0; color: var(--text-dim); }
 
 /* ===== HUD ===== */
@@ -46,6 +46,11 @@ section { position: relative; padding: 88px var(--gutter) 96px; overflow: hidden
 .hud > * { pointer-events: auto; }
 .hud__ach, .hud__btn { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px; background: rgba(0,0,0,.62); border: 2px solid rgba(255,255,255,.25); font-family: var(--font-px); font-size: 12px; }
 .hud__btn { cursor: pointer; min-width: 44px; justify-content: center; color: #fff; }
+.hud__right { display: flex; gap: 8px; }
+#nightBtn .ic-sun { display: none; }
+#nightBtn[aria-pressed="true"] .ic-sun { display: block; }
+#nightBtn[aria-pressed="true"] .ic-moon { display: none; }
+body.night .hero { background: linear-gradient(#03061a, #2a2f6a); }
 .hud__btn .snd-off { display: none; }
 .hud__btn[aria-pressed="true"] .snd-on { display: none; }
 .hud__btn[aria-pressed="true"] .snd-off { display: block; }

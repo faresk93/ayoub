@@ -64,6 +64,8 @@ export const ACH = {
   coins: { t: "1-UP! 11 coins collected", i: S.coin },
   cake: { t: "Wish made!", i: S.cake },
   chest: { t: "Opened Uncle Fares' gift", i: S.gift },
+  pixel: { t: "Best friends: petted Pixel the dog", i: S.heart },
+  night: { t: "Night owl: saw the stars", i: S.star },
 };
 const got = new Set();
 let onAll = () => {};

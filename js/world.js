@@ -4,6 +4,7 @@ import { C, mulberry32, makeCanvas } from "./textures.js";
 import { buildCharacter, makeNameTag, canvasTex } from "./character.js";
 import { AYOUB, FAMILY } from "./family.js";
 import { Fireworks3D } from "./fireworks3d.js";
+import { createExtras } from "./extras.js";
 
 const R = 11;              // island radius
 const GROUND = 0.5;        // top surface height
@@ -34,7 +35,8 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 200);
   camera.position.set(0, 8, 20);
 
-  scene.add(new THREE.HemisphereLight("#eaf4ff", "#6a8a4a", 1.5));
+  const hemi = new THREE.HemisphereLight("#eaf4ff", "#6a8a4a", 1.5);
+  scene.add(hemi);
   const sun = new THREE.DirectionalLight("#fff3d6", 2.6);
   sun.position.set(14, 22, 10);
   sun.castShadow = true;
@@ -239,6 +241,7 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
   let collected = 0;
 
   const fw = new Fireworks3D(scene);
+  const extras = createExtras(scene, { GROUND, R, fw, hooks, hemi, sun, skyTex });
   fw.onBoom = () => hooks.onBoom && hooks.onBoom();
 
   // tap target marker
@@ -299,7 +302,10 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
     const r = canvas.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    const hit = ray.intersectObjects([...player.hitMeshes, ...npcs.flatMap((n) => n.hitMeshes)], false)[0];
+    const hit = ray.intersectObjects([...player.hitMeshes, ...npcs.flatMap((n) => n.hitMeshes), ...extras.hitMeshes, elevenMesh], false)[0];
+    if (hit && hit.object === elevenMesh) { elevenParty(); return; }
+    if (hit && extras.isDog(hit.object)) { extras.bark(); return; }
+    if (hit && extras.qOf(hit.object)) { extras.hitQ(hit.object); return; }
     if (hit) {
       const who = hit.object.userData.owner;
       if (who === player) poke();
@@ -391,6 +397,7 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
     const dc = Math.hypot(p.x, p.z);
     if (dc > R - 0.8) { p.x *= (R - 0.8) / dc; p.z *= (R - 0.8) / dc; }
     vy -= 24 * dt; p.y += vy * dt;
+    if (vy > 0 && extras.checkHead(p, player.height)) vy = -1;
     if (p.y <= GROUND) { p.y = GROUND; vy = 0; grounded = true; }
 
     const celebrating = t < celebrateUntil;
@@ -452,6 +459,7 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
       const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 8;
       fw.launch(Math.cos(a) * r, 2, Math.sin(a) * r, 13);
     }
+    extras.update(dt, t, p, player.root.rotation.y, walking);
     fw.update(dt);
 
     // camera
@@ -459,12 +467,12 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
     if (mode === "hero") {
       heroYaw = RM ? 0.25 : Math.sin(t * 0.13) * 0.55;
       const portrait = W / H < 0.85;
-      const D = portrait ? 19 : 13.5, Hc = portrait ? 7 : 5.2;
+      const D = portrait ? 23 : 16, Hc = portrait ? 8.5 : 6.4;
       camTarget.set(Math.sin(heroYaw) * D, Hc, home.z + Math.cos(heroYaw) * D);
       lookAt.set(0, portrait ? 3.2 : 2.6, home.z - 1.5);
     } else {
       const portrait = W / H < 0.85;
-      const D = portrait ? 10.5 : 9;
+      const D = portrait ? 14.5 : 12.5;
       camTarget.set(p.x + Math.sin(yaw) * Math.cos(pitch) * D, p.y + 1.4 + Math.sin(pitch) * D, p.z + Math.cos(yaw) * Math.cos(pitch) * D);
       lookAt.set(p.x, p.y + 1.6, p.z);
       headPos.set(p.x, p.y + 1.8, p.z);
@@ -499,6 +507,16 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }, { threshold: 0.01 }).observe(canvas);
   document.addEventListener("visibilitychange", kick);
 
+  let lastEleven = -9;
+  function elevenParty() {
+    if (t - lastEleven < 1.2) return;
+    lastEleven = t;
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; fw.launch(eleven.position.x + Math.cos(a) * 5, 2, eleven.position.z + Math.sin(a) * 3, 12 + Math.random() * 3); }
+    fw.sparkle(eleven.position, "#ffe066", 60);
+    hooks.onEleven && hooks.onEleven();
+    kick();
+  }
+
   function celebrate() {
     celebrateUntil = t + 9;
     nextRocket = t;
@@ -511,7 +529,7 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
   return {
     enterPlay() {
       mode = "play";
-      yaw = heroYaw; pitch = 0.42;
+      yaw = heroYaw; pitch = 0.5;
       applyViewOffset();
       canvas.focus({ preventScroll: true });
       kick();
@@ -523,6 +541,8 @@ export function createWorld(canvas, { bubble, hooks = {} }) {
       kick();
     },
     jump,
+    setNight(on) { extras.setNight(on); kick(); },
+    elevenParty() { elevenParty(); },
     celebrate() { celebrate(); kick(); },
     resize,
     get collected() { return collected; },

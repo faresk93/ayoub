@@ -127,7 +127,7 @@ const LOOT = [
   { tex: "oreDiamond", item: S.diamond, name: "Diamond", wish: "May your 11th year be as rare and shiny as a diamond!" },
   { tex: "grassSide", top: "grassTop", item: S.apple, name: "Apple", wish: "Stay healthy and strong, little explorer." },
   { tex: "oreEmerald", item: S.emerald, name: "Emerald", wish: "Trade every worry for a big smile — best deal ever." },
-  { tex: "log", top: "logTop", item: S.book, name: "Book", wish: "5th grade? Easy mode for a genius like you. Every book is a new world!" },
+  { tex: "log", top: "logTop", item: S.book, name: "Book", wish: "6th grade? Easy mode for a genius like you. Every book is a new world!" },
   { tex: "oreGold", item: S.coin, name: "Gold Coin", wish: "Coins for every level you clear this year!" },
   { tex: "oreRed", item: S.heart, name: "Heart", wish: "+∞ hearts: your whole family loves you so much." },
   { tex: "dirt", item: S.pad, name: "Controller", wish: "New high scores and epic co-op sessions with Ilyes!" },
@@ -246,7 +246,7 @@ export function initBonus() {
 /* ---------- Chest & letter ---------- */
 const LETTER = [
   "Happy 11th birthday, champion! Eleven years ago today, the world spawned its best new player — and every single day since, you've made all of us proud.",
-  "You've grown into such a smart, kind and funny boy: a 5th grade hero, a master builder, a gamer with serious skills, and an amazing brother to Ilyes.",
+  "You've grown into such a smart, kind and funny boy: a 6th grade hero, a master builder, a gamer with serious skills, and an amazing brother to Ilyes.",
   "Your mom Maha loves you more than all the diamonds in every world, and Baba Deen and Mama Omi light up every time you walk in the room.",
   "Keep building, keep exploring, keep asking questions and keep laughing. Whatever level comes next, real or blocky, your family always has your back.",
   "Level 11 unlocked. I love you so much!",

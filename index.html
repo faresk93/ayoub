@@ -13,18 +13,18 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%235d9e33' d='M0 0h8v3H0z'/%3E%3Cpath fill='%23866043' d='M0 3h8v5H0z'/%3E%3Cpath fill='%234f8a2a' d='M1 3h1v1H1zM4 3h1v2H4zM6 3h1v1H6z'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-        "motion": "https://cdn.jsdelivr.net/npm/motion@11.11.13/+esm"
+        "three": "./vendor/three.module.js",
+        "motion": "./vendor/motion.js"
       }
     }
   </script>
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" crossorigin />
+  <link rel="modulepreload" href="vendor/three.module.js" />
+  <link rel="modulepreload" href="vendor/motion.js" />
 </head>
 <body>
   <!-- Loader -->
@@ -39,14 +39,19 @@
   <div class="hud" aria-label="Game status">
     <div class="hud__ach" title="Achievements">
       <img class="px" id="hudTrophy" alt="" width="24" height="24" />
-      <span><b id="achCount">0</b>/<span id="achTotal">9</span></span>
+      <span><b id="achCount">0</b>/<span id="achTotal">11</span></span>
     </div>
+    <div class="hud__right">
+    <button class="hud__btn" id="nightBtn" aria-label="Switch to night" aria-pressed="false">
+      <svg viewBox="0 0 8 8" width="22" height="22" shape-rendering="crispEdges" aria-hidden="true"><path class="ic-moon" fill="currentColor" d="M3 0h3v1H3zM2 1h2v1H2zM1 2h2v4H1zM2 6h2v1H2zM3 7h3V6H3zM5 5h2v1H5zM6 4h1v1H6z"/><path class="ic-sun" fill="currentColor" d="M3 2h2v4H3zM2 3h4v2H2zM3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM1 1h1v1H1zM6 1h1v1H6zM1 6h1v1H1zM6 6h1v1H6z"/></svg>
+    </button>
     <button class="hud__btn" id="muteBtn" aria-label="Mute sound" aria-pressed="false">
       <svg viewBox="0 0 8 8" width="22" height="22" shape-rendering="crispEdges" aria-hidden="true">
         <path class="snd-on" fill="currentColor" d="M0 3h2v2H0zM2 2h1v4H2zM3 1h1v6H3zM5 2h1v1H5zM5 5h1v1H5zM6 3h1v2H6z"/>
         <path class="snd-off" fill="currentColor" d="M0 3h2v2H0zM2 2h1v4H2zM3 1h1v6H3zM5 2h1v1H5zM7 2h1v1H7zM6 3h1v2H6zM5 5h1v1H5zM7 5h1v1H7z"/>
       </svg>
     </button>
+    </div>
   </div>
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <canvas id="fx" class="fx" aria-hidden="true"></canvas>
@@ -70,18 +75,19 @@
           <button class="mc-btn mc-btn--go" id="playBtn">▶ Play as Ayoub</button>
           <button class="mc-btn" id="scrollBtn">Explore the World ↓</button>
           <a class="mc-btn" href="#gift">Open Uncle's Gift</a>
-          <p class="hero__foot">Tap Ayoub &amp; the family · a gift from Uncle Fares</p>
+          <p class="hero__foot">Tap Ayoub, the family, Pixel the dog &amp; the golden 11 · a gift from Uncle Fares</p>
         </div>
       </div>
 
       <div class="game-ui" id="gameUI" hidden>
         <div class="game-ui__top">
           <div class="gstat gstat--gem"><img class="px" id="gemIcon" alt="" width="22" height="22" /><span>Treasures <b id="gemCount">0/11</b></span></div>
+          <div class="gstat gstat--coin"><img class="px" id="coinIcon3d" alt="" width="22" height="22" /><span><b id="coin3d">0</b></span></div>
           <div class="gstat gstat--fam"><img class="px" id="famIcon" alt="" width="22" height="22" /><span>Family <b id="famCount">0/5</b></span></div>
         </div>
         <button class="mc-btn game-ui__exit" id="exitBtn" aria-label="Exit game">✕ Exit</button>
         <button class="jump-btn" id="jumpBtn" aria-label="Jump">JUMP</button>
-        <p class="game-hint" id="gameHint" hidden>Tap the ground to walk · drag to look around · WASD / arrows + Space on keyboard. Find 11 treasures and say hi to the family!</p>
+        <p class="game-hint" id="gameHint" hidden>Tap the ground to walk · drag to look around · WASD / arrows + Space. Find 11 treasures, say hi to the family, jump into the ? blocks, pet Pixel the dog and tap the golden 11!</p>
         <div class="win" id="gameWin" hidden>
           <p class="win__kicker">All 11 treasures found!</p>
           <h2 class="win__title" aria-label="Happy Birthday Ayoub!"><span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span> <span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span><br /><span>A</span><span>Y</span><span>O</span><span>U</span><span>B</span><span>!</span></h2>
@@ -106,7 +112,7 @@
           <h2 class="panel__title">Player Profile</h2>
           <dl class="stats__list">
             <div><dt>Name</dt><dd>AYOUB</dd></div>
-            <div><dt>Class</dt><dd>5th Grade Hero</dd></div>
+            <div><dt>Class</dt><dd>6th Grade Hero</dd></div>
             <div><dt>Spawned</dt><dd>17 Nov 2015</dd></div>
             <div><dt>Days played</dt><dd><b id="days">0</b></dd></div>
             <div><dt>Loves</dt><dd>Minecraft · Mario · Nintendo</dd></div>

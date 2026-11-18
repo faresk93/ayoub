@@ -62,6 +62,8 @@ export const Sfx = (() => {
     oneup: () => [N.E5, N.G5, N.E6, N.C6, N.D6, N.G6].forEach((f, i) => tone(f, 0.12, "square", 0.28, i * 0.11)),
     level: () => [N.C5, N.E5, N.G5, N.C6].forEach((f, i) => tone(f, 0.18, "square", 0.28, i * 0.1)),
     ach: () => [N.G5, N.C6, N.E6].forEach((f, i) => tone(f, 0.15, "triangle", 0.4, i * 0.09)),
+    bark: () => { if (muted || !ensure()) return; [0, 0.16].forEach((w) => { const t = ctx.currentTime + w; const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "square"; o.frequency.setValueAtTime(620, t); o.frequency.exponentialRampToValueAtTime(260, t + 0.1); g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.13); }); noise(0.08, 0.25, 1500); noise(0.08, 0.25, 1500, 0.16); },
+    night: () => [N.C5, N.G4, N.E5, N.C6].forEach((f, i) => tone(f, 0.3, "triangle", 0.25, i * 0.14)),
     talk: () => [0, 1, 2].forEach((i) => tone(300 + Math.random() * 200, 0.05, "square", 0.15, i * 0.06)),
     blow: () => noise(0.35, 0.35, 2500),
     boom: () => noise(0.45, 0.7, 380),

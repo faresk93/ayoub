@@ -10,9 +10,10 @@ initHud();
 $("#footHeart").src = S.heart;
 $("#gemIcon").src = S.diamond;
 $("#famIcon").src = S.heart;
+$("#coinIcon3d").src = S.coin;
 
 const fill = $("#loaderFill"), hint = $("#loaderHint");
-const progress = (p, text) => { hint.textContent = text; return animate(fill, { width: `${p}%` }, { duration: RM ? 0.01 : 0.25, ease: "easeOut" }).finished; };
+const progress = (p, text) => { hint.textContent = text; fill.style.width = `${p}%`; return sleep(RM ? 10 : 220); };
 
 let world = null, cake = null;
 
@@ -33,8 +34,10 @@ async function boot() {
   }
   await progress(100, "Wrapping gifts…");
   initReveal(); initProfile(); initCompare(); initCards(); initMine(); initBonus(); initChest();
-  await animate("#loader", { opacity: 0 }, { duration: 0.45 }).finished;
-  $("#loader").remove();
+  const ld = $("#loader");
+  ld.style.transition = "opacity .45s"; ld.style.opacity = 0;
+  await sleep(460);
+  ld.remove();
   introTitle();
 }
 
@@ -52,12 +55,12 @@ function introTitle() {
   animate("#splash", { scale: [1, 1.1, 1], rotate: [-10, -10, -10] }, { duration: 0.7, repeat: Infinity, ease: "easeInOut", delay: 1 });
   letters.forEach((l, i) => animate(l, { y: [0, -8, 0], rotateY: [0, 12, 0] }, { duration: 2.6, repeat: Infinity, delay: 2 + i * 0.15, ease: "easeInOut" }));
 }
-const splashes = ["Happy 11th Birthday!", "Level 11 unlocked!", "Now in 3D!", "Ilyes approved!", "100% awesome!", "Diamonds inside!", "5th grade legend!", "Made by Uncle Fares!", "Joyeux anniversaire!", "Tap Ayoub!"];
+const splashes = ["Happy 11th Birthday!", "Level 11 unlocked!", "Now in 3D!", "Ilyes approved!", "100% awesome!", "Diamonds inside!", "6th grade legend!", "Made by Uncle Fares!", "Joyeux anniversaire!", "Tap Ayoub!"];
 let si = 0;
 setInterval(() => { si = (si + 1) % splashes.length; $("#splash").textContent = splashes[si]; }, 3200);
 
 /* ---------- 3D world hooks ---------- */
-let pokes = 0;
+let pokes = 0, coins3d = 0, barks = 0;
 const worldHooks = {
   onPoke() { Sfx.ensure(); Sfx.pop(); if (++pokes >= 3) unlock("poke"); },
   onJump() { Sfx.jump(); },
@@ -81,6 +84,9 @@ const worldHooks = {
     animate("#gameWin .win__title span", { y: [-60, 0], opacity: [0, 1] }, { delay: stagger(0.05), type: "spring", stiffness: 380, damping: 12 });
   },
   onBoom() { Sfx.boom(); },
+  onCoin() { Sfx.coin(); coins3d++; $("#coin3d").textContent = coins3d; animate(".gstat--coin", { scale: [1, 1.3, 1] }, { duration: 0.25 }); },
+  onBark() { Sfx.bark(); if (++barks >= 3) unlock("pixel"); },
+  onEleven() { Sfx.level(); },
   onExitRequest() { exitPlay(); },
 };
 
@@ -147,6 +153,17 @@ function celebrateCake() {
   animate("#hbBig span span", { y: [-80, 0], opacity: [0, 1], scale: [2, 1], rotateX: [90, 0] }, { delay: stagger(0.06), type: "spring", stiffness: 380, damping: 12 });
   FX.confetti(100);
 }
+
+/* ---------- day / night ---------- */
+$("#nightBtn").addEventListener("click", (e) => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", String(on));
+  e.currentTarget.setAttribute("aria-label", on ? "Switch to day" : "Switch to night");
+  document.body.classList.toggle("night", on);
+  Sfx.ensure(); Sfx.night();
+  world && world.setNight(on);
+  if (on) { unlock("night"); if ($("#top").getBoundingClientRect().bottom < 80) $("#top").scrollIntoView({ behavior: RM ? "auto" : "smooth" }); }
+});
 
 /* ---------- mute ---------- */
 $("#muteBtn").addEventListener("click", (e) => {
